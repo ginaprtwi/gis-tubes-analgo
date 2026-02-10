@@ -140,6 +140,40 @@ folium.Marker(
     popup=END_NAME,
     icon=folium.Icon(color="red", icon="stop")
 ).add_to(m)
+# --------------------------
+# Custom CSS untuk background + style
+# --------------------------
+st.markdown(
+    """
+    <style>
+    /* Full page gradient background */
+    .stApp {
+        background: linear-gradient(120deg,#0f172a,#1e3a8a);
+        color: white;
+    }
+
+    /* Container map */
+    .folium-map {
+        border-radius: 12px;
+        border: 1px solid #1e40af;
+    }
+
+    /* Optional: header title */
+    h1, h2, h3, p {
+        color: #93c5fd;
+    }
+
+    /* Centering all content */
+    .css-1d391kg {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # --------------------------
 # Display Map
