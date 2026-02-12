@@ -8,7 +8,8 @@ import os
 # --------------------------
 # Streamlit title
 # --------------------------
-st.title("Overlay Algoritma Dijkstra dalam Menentukan Rute Tercepat Perjalanan Sepeda Motor dari Margaasih ke Universitas Komputer Indonesia")
+st.set_page_config(layout="wide")
+st.title("Overlay Algoritma Djikstra dalam Menentukan Rute Tercepat Perjalanan Sepeda Motor dari Margaasih ke Universitas Komputer Indonesia")
 
 # --------------------------
 # Locations
