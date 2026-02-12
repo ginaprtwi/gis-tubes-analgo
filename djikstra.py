@@ -40,7 +40,7 @@ bbox = (
 )
 
 # -----------------------------------
-# Truncate graph (CORRECT API)
+# Truncate graph
 # -----------------------------------
 G = ox.truncate.truncate_graph_bbox(G_big, bbox)
 
@@ -53,7 +53,6 @@ st.write("Truncated edges:", G.number_of_edges())
 start_node = ox.nearest_nodes(G, START_LON, START_LAT)
 end_node = ox.nearest_nodes(G, END_LON, END_LAT)
 
-
 # --------------------------
 # Run Dijkstra (shortest path)
 # --------------------------
@@ -61,39 +60,31 @@ route = nx.shortest_path(
     G,
     start_node,
     end_node,
-    weight="length",  # meters
+    weight="length",
     method="dijkstra"
 )
 
 # --------------------------
-# Compute total distance (meters)
+# Compute total distance
 # --------------------------
 total_distance_m = 0.0
 
 for u, v in zip(route[:-1], route[1:]):
     edge_data = G.get_edge_data(u, v)
-
-    # MultiDiGraph: choose the shortest parallel edge
-    shortest_edge = min(
-        edge_data.values(),
-        key=lambda d: d.get("length", 0)
-    )
-
+    shortest_edge = min(edge_data.values(), key=lambda d: d.get("length", 0))
     total_distance_m += shortest_edge.get("length", 0)
 
 distance_km = total_distance_m / 1000
 
+st.success(f"Total jarak rute terpendek: {distance_km:.2f} km")
+
 # --------------------------
 # Create Folium Map
 # --------------------------
-m = folium.Map(
-    location=[(START_LAT + END_LAT) / 2, (START_LON + END_LON) / 2],
-    zoom_start=13,
-    tiles="cartodbpositron"
-)
+m = folium.Map(tiles="cartodbpositron")
 
 # --------------------------
-# Draw graph edges (light, optional)
+# Draw graph edges (optional background)
 # --------------------------
 for u, v, data in G.edges(data=True):
     if "geometry" in data:
@@ -108,15 +99,13 @@ for u, v, data in G.edges(data=True):
         coords,
         color="gray",
         weight=1,
-        opacity=0.5
+        opacity=0.3
     ).add_to(m)
 
 # --------------------------
 # Overlay shortest path
 # --------------------------
-path_coords = [
-    (G.nodes[n]["y"], G.nodes[n]["x"]) for n in route
-]
+path_coords = [(G.nodes[n]["y"], G.nodes[n]["x"]) for n in route]
 
 folium.PolyLine(
     path_coords,
@@ -125,6 +114,11 @@ folium.PolyLine(
     opacity=0.9,
     tooltip=f"Rute Terpendek: {total_distance_m:.0f} meter ({distance_km:.2f} km)"
 ).add_to(m)
+
+# --------------------------
+# Auto-center & zoom to route
+# --------------------------
+m.fit_bounds(path_coords, padding=(50, 50))
 
 # --------------------------
 # Markers
@@ -140,35 +134,25 @@ folium.Marker(
     popup=END_NAME,
     icon=folium.Icon(color="red", icon="stop")
 ).add_to(m)
+
 # --------------------------
-# Custom CSS untuk background + style
+# Custom CSS
 # --------------------------
 st.markdown(
     """
     <style>
-    /* Full page gradient background */
     .stApp {
         background: linear-gradient(120deg,#0f172a,#1e3a8a);
         color: white;
     }
 
-    /* Container map */
     .folium-map {
         border-radius: 12px;
         border: 1px solid #1e40af;
     }
 
-    /* Optional: header title */
     h1, h2, h3, p {
         color: #93c5fd;
-    }
-
-    /* Centering all content */
-    .css-1d391kg {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
     }
     </style>
     """,
